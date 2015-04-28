@@ -1,6 +1,6 @@
 {
 	"name": "deploy",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"dependencies": {
 		"glob": "5.x",
 		"q": "1.x",

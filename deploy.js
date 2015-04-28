@@ -6,20 +6,10 @@ var Q = require('q')
 var ssh = require('./lib/ssh')
 var _ = require('underscore')
 
-//
-// BEGIN helper functions
-//
-
-//
-// promise-glob
-//
-function glob(pattern) {
+function glob(pattern, ignore) {
 	var g = require('glob')
-	return Q.nfcall(g.glob.bind(g.glob), pattern)
+	return Q.nfcall(g.glob.bind(g.glob), pattern, { ignore: ignore })
 }
-//
-// END helper functions
-//
 
 //
 // now for the work:
@@ -36,21 +26,29 @@ function glob(pattern) {
 //
 // 1) Read configuration
 //
+try {
+	fs.statSync(process.cwd() + '/deploy-config.json')
+} catch(e) {
+	console.log('No such file found in current directory: deploy-config.json')
+	return
+}
+
 var CFG = JSON.parse(fs.readFileSync(process.cwd() + '/deploy-config.json'))
 
 //
 // 2) prompt for host to copy to
 //
-console.log('HOSTS:')
-console.log(_.map(CFG.hosts, function(host, index) {
-	return '\t' + (index + 1) + ':\t' + host.host
-}).join('\r\n'))
 
 var host = null
 if (CFG.hosts.length > 1) {
+	console.log('HOSTS:')
+	console.log(_.map(CFG.hosts, function(host, index) {
+		return '\t' + (index + 1) + ':\t' + host.host
+	}).join('\r\n'))
+
 	host = discus.ask('Which host do you want to deploy to? ')
 } else if (CFG.hosts.length == 1) {
-	host = Q.resolve(CFG.hosts[0])
+	host = Q.resolve(1)
 } else {
 	host = Q.reject(new Error('No hosts defined'))
 }
@@ -70,6 +68,7 @@ host
 // test that password-less connections are supported to host...
 //
 .then(function(host) {
+	console.log('Checking connection...')
 	return ssh.shell('ssh -oBatchMode=yes ' + host.user + '@' + host.host + ' echo "true"')
 	.then(function(output) {
 		if ((output || '').trim() != 'true') {
@@ -86,20 +85,16 @@ host
 // 3) glob files...
 //
 .then(function (host) {
-	var fileTypes = _.map(CFG.fileTypes, function(ft) { return './**/*.' + ft })
+	var multiGlob = Q.all(_.map(CFG.files, function(ft) {
+		return glob(ft, CFG.ignore)
+	}))
+	.then(function(results) {
+		return _.flatten(results)
+	})
 
-	// return [ host, promise(files) ]
 	return [
 		host,
-		Q.all(_.map(fileTypes, function(ft) {
-			return glob(ft)
-		}))
-		.then(function(results) {
-			results = _.filter(_.flatten(results), function(path) {
-				return path.indexOf('./deploy/') == -1
-			})
-			return results
-		})
+		multiGlob
 	]
 })
 
@@ -113,6 +108,7 @@ host
 	console.log('  HOST: ' + host.host)
 	console.log('  FILES TO COPY:')
 	console.log(_.map(files, function(f) { return '    ' + f }).join('\n'))
+	console.log('(' + files.length + ' file(s))')
 	console.log()
 
 	return Q.all([ host, files, discus.confirm('Are you sure you want to continue? [Y/n]: ') ])
