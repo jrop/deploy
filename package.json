@@ -1,0 +1,12 @@
+{
+	"name": "deploy",
+	"version": "0.0.1",
+	"dependencies": {
+		"glob": "5.x",
+		"q": "1.x",
+		"underscore": "1.x"
+	},
+	"bin": {
+		"wp-deploy": "./deploy.js"
+	}
+}
