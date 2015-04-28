@@ -7,6 +7,6 @@
 		"underscore": "1.x"
 	},
 	"bin": {
-		"wp-deploy": "./deploy.js"
+		"deploy": "./deploy.js"
 	}
 }
