@@ -11,6 +11,13 @@ function glob(pattern, ignore) {
 	return Q.nfcall(g.glob.bind(g.glob), pattern, { ignore: ignore })
 }
 
+function hostname(host) {
+	if (host.alias)
+		return host.alias + ' (' + host.host + ')'
+	else
+		return host.host
+}
+
 //
 // now for the work:
 //
@@ -43,7 +50,7 @@ var host = null
 if (CFG.hosts.length > 1) {
 	console.log('HOSTS:')
 	console.log(_.map(CFG.hosts, function(host, index) {
-		return '\t' + (index + 1) + ':\t' + host.host
+		return '\t' + (index + 1) + ':\t' + hostname(host)
 	}).join('\r\n'))
 
 	host = discus.ask('Which host do you want to deploy to? ')
@@ -85,6 +92,9 @@ host
 // 3) glob files...
 //
 .then(function (host) {
+	if (process.argv.length > 2)
+		CFG.files = process.argv.slice(2)
+
 	var multiGlob = Q.all(_.map(CFG.files, function(ft) {
 		return glob(ft, CFG.ignore)
 	}))
@@ -105,7 +115,7 @@ host
 	console.log()
 	console.log('Please review the following information:')
 	console.log()
-	console.log('  HOST: ' + host.host)
+	console.log('  HOST: ' + hostname(host))
 	console.log('  FILES TO COPY:')
 	console.log(_.map(files, function(f) { return '    ' + f }).join('\n'))
 	console.log('(' + files.length + ' file(s))')
