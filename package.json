@@ -1,12 +1,19 @@
 {
-	"name": "deploy",
-	"version": "0.0.2",
-	"dependencies": {
-		"glob": "5.x",
-		"q": "1.x",
-		"underscore": "1.x"
-	},
-	"bin": {
-		"deploy": "./deploy.js"
-	}
+  "name": "deploy",
+  "version": "0.0.2",
+  "dependencies": {
+    "babel-runtime": "^5.6.15",
+    "lodash": "^3.9.3",
+    "prompt": "^0.2.14",
+    "q": "1.x"
+  },
+  "bin": {
+    "deploy": "./index.js"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-babel": "^5.1.0",
+    "gulp-print": "^1.1.0",
+    "gulp-watch": "^4.2.4"
+  }
 }
