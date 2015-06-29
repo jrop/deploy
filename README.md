@@ -1,24 +1,33 @@
-# Deploy
+Deploy
+======
 
 `npm install -g https://jrop@bitbucket.org/jrop/deploy.git`
 
-Then in your projects base directory, create a file called `deploy-config.json` that looks something like this:
+Then in your projects `package.json` file add the following configuration:
 
 ```
-{
-	"files" : [ "*.php", "css/*", "img/*", "js/*" ],
-	"ingore": "css/",
-	"hosts": [
-		{
-			"host": "test-informationsystems.colostate.edu",
-			"user": "cwis604",
-			"dir": "~/public_html/wp-content/themes/is"
-		},
-		{
-			"host": "informationsystems.colostate.edu",
-			"user": "cwis604",
-			"dir": "~/domains/informationsystems.colostate.edu/public_html/wp-content/themes/is"
-		}
-	]
+"rsync": {
+	"destinations": [{
+		"destination": "user@host:/path/to/directory",
+		"name": "Host #1",
+		"alias": "host-1"
+	}, ...],
+	"exclude": ["pattern1", ...]
 }
 ```
+
+Then run:
+
+```
+deploy -i
+```
+
+(This runs in interactive mode, and prompts for various options)
+
+Or run:
+
+```
+deploy --alias host-1
+```
+
+If you do not wish to be prompted for confirmation, add the `-no-confirmation` flag.
