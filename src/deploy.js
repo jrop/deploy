@@ -1,8 +1,7 @@
-import Q from 'q'
 import { exec } from 'child_process'
-import fs from 'fs'
+import fs from 'mz/fs'
+import inquirer from 'inquirer'
 import path from 'path'
-import prompt from 'prompt'
 import _ from 'lodash'
 
 //
@@ -23,10 +22,20 @@ function printHelp() {
 	h('  }\n')
 	h('Options:')
 	h('  -i                   interactive mode')
-	h('  -no-confirmation     only works in interactive mode: does not prompt for confirmation')
+	h('  -no-confirmation     only works in non-interactive mode: does not prompt for confirmation')
 	h('  --alias [name]       load the destination with alias [name]')
 	h('  --dry-run            run rsync in dry-run mode')
 	h('  --delete             delete remote files that do not exist locally')
+}
+
+//
+// child_process.exec as a promise
+//
+function pexec(cmd, opts) {
+	opts = opts || { }
+	return new Promise((yes, no) => {
+		exec(cmd, opts, (stdout, stderr) => yes([ stdout, stderr ]))
+	})
 }
 
 //
@@ -52,20 +61,10 @@ function validate(conf) {
 //
 // Prompts the user
 //
-async function ask(q) {
-	try {
-		prompt.message = ''
-		prompt.delimiter = ''
-		prompt.start()
-
-		let response = await Q.nfcall(prompt.get, [{
-			name: q
-		}])
-
-		return response[q]
-	} catch (e) {
-		return null
-	}
+function inquire(questions) {
+	return new Promise((yes, no) => {
+		inquirer.prompt(questions, answers => yes(answers))
+	})
 }
 
 //
@@ -85,45 +84,36 @@ async function getCommand(conf) {
 		let destIndex = 0
 
 		if (conf.destinations.length > 1) {
-			console.log(_.map(conf.destinations,
-							(dest, i) => (i + 1) + ': ' + dest.name)
-						.join('\n'))
-
-			destIndex = parseInt(await ask('Which host do you want to deploy to?')) - 1
-			if (isNaN(destIndex) || destIndex < 0 || destIndex >= conf.destinations.length) {
-				console.error('The given response is not a number or was not a valid option!')
-				process.exit(1)
-			}
+			let answers = await inquire([{
+				name: 'destIndex',
+				type: 'list',
+				message: 'Which host do you want to deploy to?',
+				choices: _.map(conf.destinations, (dest, index) => ({ name: dest.name, value: index }))
+			}]) // parseInt(await ask('Which host do you want to deploy to?')) - 1
+			destIndex = answers.destIndex
 		}
 
-		console.log(_.map([ 'Normal (--dry-run)', 'Normal', 'Delete (--delete --dry-run)', 'Delete (--delete)' ], (p, i) => (i + 1) + ': ' + p).join('\n'))
-		let type = parseInt(await ask('How would you like to deploy?'))
-		if (isNaN(type) || type < 1 || type > 4) {
-			console.error('The given response was not a valid option!')
-			process.exit(1)
-		}
-
-		switch (type) {
-		case 1:
-			cmd.push('--dry-run')
-			break
-		case 2:
-			break
-		case 3:
-			cmd.push('--dry-run')
-			cmd.push('--delete')
-			break
-		case 4:
-			cmd.push('--delete')
-			break
-		}
-
+		let typeArgs = await inquire([{
+			type: 'list',
+			name: 'type',
+			message: 'How would you like to deploy?',
+			choices: [
+				{ name: 'Normal (--dry-run)', value: [ '--dry-run' ] },
+				{ name: 'Normal', value: [] }, 
+				{ name: 'Delete (--delete --dry-run)', value: [ '--delete', '--dry-run' ] }, 
+				{ name: 'Delete (--delete)', value: [ '--delete' ] } ]
+		}])
+		cmd = cmd.concat(typeArgs.type)
 		addInvariants()
 		cmd.push(conf.destinations[destIndex].destination)
 
 		console.log('Command: ' + _.flatten(cmd).join(' '))
-		let confirm = await ask('Do you want to execute the above command? [Y/n]:')
-		if (confirm != 'Y') {
+		let answer = await inquire([{
+			type: 'confirm',
+			message: 'Do you want to execute the above command?',
+			name: 'confirm'
+		}])
+		if (answer.confirm === false) {
 			console.log('Aborting')
 			process.exit(1)
 		}
@@ -172,7 +162,7 @@ async function getCommand(conf) {
 	try {
 		let pkgPath = path.join(process.cwd(), 'package.json')
 		let pkgStat = null
-		try { pkgStat = await Q.nfcall(fs.stat, pkgPath) } catch (e) { }
+		try { pkgStat = await fs.stat(pkgPath) } catch (e) { }
 
 		if (!pkgStat) {
 			console.error('The file "package.json" does not exist in the current directory ("' + process.cwd() + '"); exiting.')
@@ -189,10 +179,10 @@ async function getCommand(conf) {
 		validate(conf)
 
 		let cmd = await getCommand(conf)
-		let [ stdout, stderr ] = await Q.nfcall(exec, cmd.join(' '), { cwd: process.cwd() })
-		if (stdout.length)
+		let [ stdout, stderr ] = await pexec(cmd.join(' '), { cwd: process.cwd() })
+		if (stdout && stdout.length)
 			console.log(stdout)
-		if (stderr.length)
+		if (stderr && stderr.length)
 			console.error(stderr)
 	} catch (e) {
 		console.error(e.stack)
