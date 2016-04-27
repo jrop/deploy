@@ -7,19 +7,20 @@ Then in your projects `package.json` file add the following configuration:
 
 ```
 "rsync": {
-	"destinations": [{
-		"destination": "user@host:/path/to/directory",
+	"destinations": [ {
+		"dest": "user@host:/path/to/directory",
 		"name": "Host #1",
 		"alias": "host-1"
-	}, ...],
-	"exclude": ["pattern1", ...]
+	}, ... ],
+	"exclude": [ "pattern1", ... ],
+	"args": [ "--update" ]
 }
 ```
 
 Then run:
 
 ```
-deploy -i
+deploy
 ```
 
 (This runs in interactive mode, and prompts for various options)
@@ -30,4 +31,4 @@ Or run:
 deploy --alias host-1
 ```
 
-If you do not wish to be prompted for confirmation, add the `-no-confirmation` flag.
+If you do not wish to be prompted for confirmation, add the `--no-confirm` flag.

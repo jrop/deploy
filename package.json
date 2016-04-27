@@ -1,22 +1,14 @@
 {
   "name": "deploy",
-  "version": "0.0.3",
-  "dependencies": {
-    "babel-runtime": "^5.6.15",
-    "inquirer": "^0.10.1",
-    "lodash": "^3.9.3",
-    "mz": "^2.1.0"
-  },
+  "version": "0.1.0",
   "bin": {
     "deploy": "./index.js"
   },
-  "scripts": {
-    "prepublish": "gulp clean && gulp"
-  },
-  "devDependencies": {
-    "gulp": "^3.9.0",
-    "gulp-babel": "^5.1.0",
-    "gulp-print": "^1.1.0",
-    "rimraf": "^2.4.3"
+  "dependencies": {
+    "co": "^4.6.0",
+    "inquirer": "^1.0.2",
+    "mz": "^2.1.0",
+    "rsyncwrapper": "^1.0.0",
+    "yargs": "^4.6.0"
   }
 }
