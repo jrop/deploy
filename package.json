@@ -4,11 +4,17 @@
   "bin": {
     "deploy": "./index.js"
   },
+  "scripts": {
+    "lint": "eslint index.js"
+  },
   "dependencies": {
     "co": "^4.6.0",
     "inquirer": "^1.0.2",
     "mz": "^2.1.0",
     "rsyncwrapper": "^1.0.0",
     "yargs": "^4.6.0"
+  },
+  "devDependencies": {
+    "eslint": "^2.8.0"
   }
 }

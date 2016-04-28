@@ -20,12 +20,12 @@ function rsync(opts) {
 const interactive = co.wrap(function* (conf) {
 	let destIndex = 0
 	if (conf.destinations.length > 1) {
-		const answers = yield inquirer.prompt([{
+		const answers = yield inquirer.prompt([ {
 			name: 'destIndex',
 			type: 'list',
 			message: 'Which host do you want to deploy to?',
-			choices: conf.destinations.map((dest, index) => ({ name: dest.name, value: index }))
-		}])
+			choices: conf.destinations.map((dest, index) => ({ name: dest.name, value: index })),
+		} ])
 		destIndex = answers.destIndex
 	}
 
@@ -37,7 +37,7 @@ const interactive = co.wrap(function* (conf) {
 			{ name: 'Normal (--dry-run)', value: { dryRun: true } },
 			{ name: 'Normal', value: [] },
 			{ name: 'Delete (--delete --dry-run)', value: { delete: true, dryRun: true } },
-			{ name: 'Delete (--delete)', value: { delete: true } } ]
+			{ name: 'Delete (--delete)', value: { delete: true } } ],
 	} ])
 
 	return {
@@ -51,7 +51,6 @@ const interactive = co.wrap(function* (conf) {
 // MAIN
 //
 co(function* () {
-	const pkgPath = path.join(process.cwd(), 'package.json')
 	const args = yargs.usage('$0 [options]')
 		.options({
 			'alias': { alias: 'a', type: 'string', desc: 'Use an aliased destination' },
@@ -60,8 +59,10 @@ co(function* () {
 			'dry-run': { alias: 'n', type: 'boolean', default: false },
 		})
 		.help().alias('help', 'h')
+		.version('version', 'Print the `deploy` version', require('./package.json').version).alias('version', 'v')
 		.argv
 
+	const pkgPath = path.join(process.cwd(), 'package.json')
 	yield fs.access(pkgPath, fs.R_OK)
 
 	let conf = JSON.parse(yield fs.readFile(pkgPath)).rsync
@@ -74,12 +75,7 @@ co(function* () {
 	if (conf.destinations.length === 0)
 		throw new Error('No destinations declared in package.json (rsync.destinations)')
 
-	// archive by default
-	if (conf.args.indexOf('-a') === -1 && conf.args.indexOf('--archive') === -1 &&
-			conf.args.indexOf('--no-archive') === -1)
-		conf.args.push('--archive')
-
-	let setup = args.alias ? {
+	const setup = args.alias ? {
 		destIndex: conf.destinations.findIndex(d => d.alias == args.alias),
 		delete: args.delete,
 		dryRun: args.dryRun,
