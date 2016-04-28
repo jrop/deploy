@@ -113,7 +113,7 @@ co(function* () {
 	if (obj.stdout) console.log(obj.stdout)
 	if (obj.stderr) console.error(obj.stderr)
 }).catch((e) => {
-	if (e.cmd) console.log('Error executing shell command', e.cmd)
+	if (e.cmd) console.error('Error executing shell command', e.cmd)
 	if (e.stdout) console.log(e.stdout)
 	if (e.stderr) console.error(e.stderr)
 	console.error(e.stack)

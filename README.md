@@ -1,9 +1,14 @@
-Deploy
-======
+# Deploy
 
-`npm install -g https://jrop@bitbucket.org/jrop/deploy.git`
+> Control rsync with config in your package.json
 
-Then in your projects `package.json` file add the following configuration:
+## Installation
+
+`npm install -g deploy-rsync`
+
+## Use
+
+Configuration for `deploy` is handled by adding configuration to your `package.json` file.  An example configuration is:
 
 ```
 "rsync": {
@@ -17,18 +22,18 @@ Then in your projects `package.json` file add the following configuration:
 }
 ```
 
-Then run:
+Then you may run `deploy` in the same directory as this `package.json` file.
 
 ```
-deploy
+$ deploy
 ```
 
 (This runs in interactive mode, and prompts for various options)
 
-Or run:
+Or, to run in non-interactive mode:
 
 ```
-deploy --alias host-1
+$ deploy --alias host-1
 ```
 
 If you do not wish to be prompted for confirmation, add the `--no-confirm` flag.

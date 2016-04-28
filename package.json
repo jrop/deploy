@@ -1,6 +1,6 @@
 {
-  "name": "deploy",
-  "version": "0.1.0",
+  "name": "deploy-rsync",
+  "version": "1.0.0",
   "bin": {
     "deploy": "./index.js"
   },
