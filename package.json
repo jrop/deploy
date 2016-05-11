@@ -1,20 +1,28 @@
 {
   "name": "deploy-rsync",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "bin": {
-    "deploy": "./index.js"
+    "deploy": "./deploy.js"
   },
   "scripts": {
-    "lint": "eslint index.js"
+    "coverage": "istanbul cover _mocha './test/**/test.js'",
+    "lint": "eslint deploy.js lib.js",
+    "test": "mocha './test/*.js'"
   },
   "dependencies": {
+    "arrify": "^1.0.1",
     "co": "^4.6.0",
     "inquirer": "^1.0.2",
     "mz": "^2.1.0",
+    "object.omit": "^2.0.0",
     "rsyncwrapper": "^1.0.0",
     "yargs": "^4.6.0"
   },
   "devDependencies": {
-    "eslint": "^2.8.0"
+    "bdd-stdin": "^0.2.0",
+    "chai": "^3.5.0",
+    "eslint": "^2.8.0",
+    "istanbul": "^0.4.3",
+    "mocha": "^2.4.5"
   }
 }
