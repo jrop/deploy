@@ -11,14 +11,21 @@
 Configuration for `deploy` is handled by adding configuration to your `package.json` file.  An example configuration is:
 
 ```
-"rsync": {
+"deploy": {
 	"destinations": [ {
 		"dest": "user@host:/path/to/directory",
 		"name": "Host #1",
-		"alias": "host-1"
+		"alias": "host-1",
+		"preHooks": (array or string),
+		"postHooks": (array or string)
 	}, ... ],
 	"exclude": [ "pattern1", ... ],
-	"args": [ "--update" ]
+	"args": [ "--update" ],
+
+	// or optionally:
+	"src": "...",
+	"dest": "...",
+	"args": [ "-avn" ],
 }
 ```
 
