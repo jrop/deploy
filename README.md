@@ -16,6 +16,7 @@ Configuration for `deploy` is handled by adding configuration to your `package.j
 		"dest": "user@host:/path/to/directory",
 		"name": "Host #1",
 		"alias": "host-1",
+		"env": (object),
 		"preHooks": (array or string),
 		"postHooks": (array or string)
 	}, ... ],
