@@ -58,6 +58,11 @@ co(function* () {
 	if (args.delete) conf.delete = args.delete
 	if (args.dryRun) conf.dryRun = args.dryRun
 
+	// set environment variables
+	for (const envName in parsed.env) {
+		process.env[envName] = parsed.env[envName]
+	}
+
 	console.log('Command:', yield getCommand(conf))
 	let run = true
 	if (args.confirm) {

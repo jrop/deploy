@@ -41,12 +41,20 @@ describe('deploy', () => {
 			dest: 'some-directory/',
 			src: './test',
 			args: [ '-r' ],
+			env: {
+				NODE_ENV: 'production',
+			},
 		}).then((conf) => {
 			expect(conf).to.deep.equal({
 				config: {
 					args: [ '-r' ],
 					dest: 'some-directory/',
 					src: './test',
+				},
+				env: {
+					DEPLOY_ALIAS: undefined,
+					DEPLOY_NAME: undefined,
+					NODE_ENV: 'production',
 				},
 				postHooks: [],
 				preHooks: [],
@@ -70,6 +78,10 @@ describe('deploy', () => {
 					dest: './temp',
 					src: './',
 				},
+				env: {
+					DEPLOY_ALIAS: 'test',
+					DEPLOY_NAME: undefined,
+				},
 				postHooks: [],
 				preHooks: [],
 			})
@@ -91,6 +103,10 @@ describe('deploy', () => {
 					args: [ '-r', '--checksum' ],
 					dest: '../backup',
 					src: './',
+				},
+				env: {
+					DEPLOY_ALIAS: 'spec',
+					DEPLOY_NAME: 'Specific',
 				},
 				postHooks: [],
 				preHooks: [],
@@ -117,6 +133,10 @@ describe('deploy', () => {
 					exclude: '.git*',
 					src: './',
 				},
+				env: {
+					DEPLOY_ALIAS: 'hooks',
+					DEPLOY_NAME: undefined,
+				},
 				postHooks: [ "echo 'post'", "echo 'last'" ],
 				preHooks: [ "echo 'first'", "echo 'pre'" ],
 			})
@@ -142,6 +162,10 @@ describe('deploy', () => {
 					dryRun: true,
 					src: './',
 				},
+				env: {
+					DEPLOY_ALIAS: 'hooks',
+					DEPLOY_NAME: undefined,
+				},
 				postHooks: [ "echo 'post'", "cat /tmp/post", "echo 'last'" ],
 				preHooks: [ "echo 'first'", "cat /tmp/pre", "echo 'pre'" ],
 			})
@@ -153,6 +177,7 @@ describe('deploy', () => {
 		return parse({}, {
 			destinations: [ {
 				alias: 'dest',
+				dryRun: true,
 				name: 'First Destination',
 			}, {
 				alias: 'real',
@@ -165,6 +190,10 @@ describe('deploy', () => {
 					args: [],
 					dest: './not-actually/a-real/path',
 					src: './',
+				},
+				env: {
+					DEPLOY_ALIAS: 'real',
+					DEPLOY_NAME: 'Real Destination',
 				},
 				postHooks: [],
 				preHooks: [],
@@ -185,6 +214,10 @@ describe('deploy', () => {
 					dest: '/',
 					dryRun: true,
 					src: './root',
+				},
+				env: {
+					DEPLOY_ALIAS: undefined,
+					DEPLOY_NAME: undefined,
 				},
 				postHooks: [],
 				preHooks: [],
