@@ -38,7 +38,7 @@ describe('deploy', () => {
 
 	it('should allow a config with no destinations', () => {
 		return parse({}, {
-			dest: 'some-directory/',
+			dest: 'user@example.com:~/some-directory/',
 			src: './test',
 			args: [ '-r' ],
 			env: {
@@ -48,11 +48,15 @@ describe('deploy', () => {
 			expect(conf).to.deep.equal({
 				config: {
 					args: [ '-r' ],
-					dest: 'some-directory/',
+					dest: 'user@example.com:~/some-directory/',
 					src: './test',
 				},
 				env: {
 					DEPLOY_ALIAS: undefined,
+					DEPLOY_DEST_DIR: '~/some-directory/',
+					DEPLOY_DEST_HOST: 'example.com',
+					DEPLOY_DEST_PROTOCOL: undefined,
+					DEPLOY_DEST_USER: 'user',
 					DEPLOY_NAME: undefined,
 					NODE_ENV: 'production',
 				},
@@ -67,7 +71,7 @@ describe('deploy', () => {
 			destinations: [ {
 				alias: 'test',
 				args: [ '-a' ],
-				dest: './temp',
+				dest: 'ssh://user@example.com:~/temp',
 				delete: true,
 			} ],
 		}).then((conf) => {
@@ -75,11 +79,15 @@ describe('deploy', () => {
 				config: {
 					args: [ '-a' ],
 					delete: true,
-					dest: './temp',
+					dest: 'ssh://user@example.com:~/temp',
 					src: './',
 				},
 				env: {
 					DEPLOY_ALIAS: 'test',
+					DEPLOY_DEST_DIR: '~/temp',
+					DEPLOY_DEST_HOST: 'example.com',
+					DEPLOY_DEST_PROTOCOL: 'ssh',
+					DEPLOY_DEST_USER: 'user',
 					DEPLOY_NAME: undefined,
 				},
 				postHooks: [],
@@ -106,6 +114,10 @@ describe('deploy', () => {
 				},
 				env: {
 					DEPLOY_ALIAS: 'spec',
+					DEPLOY_DEST_DIR: '../backup',
+					DEPLOY_DEST_HOST: undefined,
+					DEPLOY_DEST_PROTOCOL: undefined,
+					DEPLOY_DEST_USER: undefined,
 					DEPLOY_NAME: 'Specific',
 				},
 				postHooks: [],
@@ -135,6 +147,10 @@ describe('deploy', () => {
 				},
 				env: {
 					DEPLOY_ALIAS: 'hooks',
+					DEPLOY_DEST_DIR: './nowhere',
+					DEPLOY_DEST_HOST: undefined,
+					DEPLOY_DEST_PROTOCOL: undefined,
+					DEPLOY_DEST_USER: undefined,
 					DEPLOY_NAME: undefined,
 				},
 				postHooks: [ "echo 'post'", "echo 'last'" ],
@@ -164,6 +180,10 @@ describe('deploy', () => {
 				},
 				env: {
 					DEPLOY_ALIAS: 'hooks',
+					DEPLOY_DEST_DIR: './somewhere',
+					DEPLOY_DEST_HOST: undefined,
+					DEPLOY_DEST_PROTOCOL: undefined,
+					DEPLOY_DEST_USER: undefined,
 					DEPLOY_NAME: undefined,
 				},
 				postHooks: [ "echo 'post'", "cat /tmp/post", "echo 'last'" ],
@@ -193,6 +213,10 @@ describe('deploy', () => {
 				},
 				env: {
 					DEPLOY_ALIAS: 'real',
+					DEPLOY_DEST_DIR: './not-actually/a-real/path',
+					DEPLOY_DEST_HOST: undefined,
+					DEPLOY_DEST_PROTOCOL: undefined,
+					DEPLOY_DEST_USER: undefined,
 					DEPLOY_NAME: 'Real Destination',
 				},
 				postHooks: [],
@@ -204,19 +228,23 @@ describe('deploy', () => {
 	it('should prompt for an argument set', () => {
 		bddStdin(bddStdin.keys.down, bddStdin.keys.down, '\n')
 		return parse({ prompt: true }, {
-			dest: '/',
+			dest: 'example.com:/',
 			src: './root',
 		}).then((conf) => {
 			expect(conf).to.deep.equal({
 				config: {
 					args: [],
 					delete: true,
-					dest: '/',
+					dest: 'example.com:/',
 					dryRun: true,
 					src: './root',
 				},
 				env: {
 					DEPLOY_ALIAS: undefined,
+					DEPLOY_DEST_DIR: '/',
+					DEPLOY_DEST_HOST: 'example.com',
+					DEPLOY_DEST_PROTOCOL: undefined,
+					DEPLOY_DEST_USER: undefined,
 					DEPLOY_NAME: undefined,
 				},
 				postHooks: [],
