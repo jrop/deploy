@@ -52,21 +52,28 @@ module.exports.parseConfig = co.wrap(function* (args, conf) {
 	// destination-specific hooks are executed between general hooks
 	const preHooks = arrify(conf.preHooks).concat(arrify(destination.preHooks))
 	const postHooks = arrify(destination.postHooks).concat(arrify(conf.postHooks))
+
+	const omitKeys = [ 'postHooks', 'preHooks', 'env', 'destinations' ]
+	const config = Object.assign(setup, omit(conf, omitKeys),
+		omit(destination, [ 'alias', 'name' ].concat(omitKeys)))
+
+	if (typeof config.dest === 'undefined')
+		throw new Error(`No destination found. Available aliases: ${conf.destinations.map(d => d.alias)}`)
+
+	// groups: [ protocol, username, hostname, directory ]
+	const destMatches = /^(?:(.+):\/\/)?(?:(.+)@)?(?:(.*?):)?(.*)$/.exec(config.dest)
+
 	const env = Object.assign({
 		DEPLOY_ALIAS: destination.alias,
 		DEPLOY_NAME: destination.name,
+		DEPLOY_DEST_PROTOCOL: destMatches[1],
+		DEPLOY_DEST_USER: destMatches[2],
+		DEPLOY_DEST_HOST: destMatches[3],
+		DEPLOY_DEST_DIR: destMatches[4],
 	}, conf.env, destination.env)
 
-	const omitKeys = [ 'postHooks', 'preHooks', 'env' ]
-	conf = Object.assign(setup, omit(conf, omitKeys),
-		omit(destination, [ 'alias', 'name' ].concat(omitKeys)))
-
-	if (typeof conf.dest === 'undefined')
-		throw new Error(`No destination found. Available aliases: ${conf.destinations.map(d => d.alias)}`)
-
-	delete conf.destinations // remove destinations just in case
 	return {
-		config: conf,
+		config,
 		env,
 		preHooks,
 		postHooks,
