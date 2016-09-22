@@ -1,6 +1,6 @@
 {
   "name": "deploy-rsync",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "bin": {
     "deploy": "./deploy.js"
   },
@@ -24,5 +24,8 @@
     "eslint": "^2.8.0",
     "istanbul": "^0.4.3",
     "mocha": "^2.4.5"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
   }
 }
