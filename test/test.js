@@ -53,6 +53,7 @@ describe('deploy', () => {
 				},
 				env: {
 					DEPLOY_ALIAS: undefined,
+					DEPLOY_DEST: 'user@example.com:~/some-directory/',
 					DEPLOY_DEST_DIR: '~/some-directory/',
 					DEPLOY_DEST_HOST: 'example.com',
 					DEPLOY_DEST_PROTOCOL: undefined,
@@ -84,6 +85,7 @@ describe('deploy', () => {
 				},
 				env: {
 					DEPLOY_ALIAS: 'test',
+					DEPLOY_DEST: 'ssh://user@example.com:~/temp',
 					DEPLOY_DEST_DIR: '~/temp',
 					DEPLOY_DEST_HOST: 'example.com',
 					DEPLOY_DEST_PROTOCOL: 'ssh',
@@ -114,6 +116,7 @@ describe('deploy', () => {
 				},
 				env: {
 					DEPLOY_ALIAS: 'spec',
+					DEPLOY_DEST: '../backup',
 					DEPLOY_DEST_DIR: '../backup',
 					DEPLOY_DEST_HOST: undefined,
 					DEPLOY_DEST_PROTOCOL: undefined,
@@ -147,6 +150,7 @@ describe('deploy', () => {
 				},
 				env: {
 					DEPLOY_ALIAS: 'hooks',
+					DEPLOY_DEST: './nowhere',
 					DEPLOY_DEST_DIR: './nowhere',
 					DEPLOY_DEST_HOST: undefined,
 					DEPLOY_DEST_PROTOCOL: undefined,
@@ -180,6 +184,7 @@ describe('deploy', () => {
 				},
 				env: {
 					DEPLOY_ALIAS: 'hooks',
+					DEPLOY_DEST: './somewhere',
 					DEPLOY_DEST_DIR: './somewhere',
 					DEPLOY_DEST_HOST: undefined,
 					DEPLOY_DEST_PROTOCOL: undefined,
@@ -213,6 +218,7 @@ describe('deploy', () => {
 				},
 				env: {
 					DEPLOY_ALIAS: 'real',
+					DEPLOY_DEST: './not-actually/a-real/path',
 					DEPLOY_DEST_DIR: './not-actually/a-real/path',
 					DEPLOY_DEST_HOST: undefined,
 					DEPLOY_DEST_PROTOCOL: undefined,
@@ -241,6 +247,7 @@ describe('deploy', () => {
 				},
 				env: {
 					DEPLOY_ALIAS: undefined,
+					DEPLOY_DEST: 'example.com:/',
 					DEPLOY_DEST_DIR: '/',
 					DEPLOY_DEST_HOST: 'example.com',
 					DEPLOY_DEST_PROTOCOL: undefined,

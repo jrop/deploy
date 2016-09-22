@@ -66,6 +66,7 @@ module.exports.parseConfig = co.wrap(function* (args, conf) {
 	const env = Object.assign({
 		DEPLOY_ALIAS: destination.alias,
 		DEPLOY_NAME: destination.name,
+		DEPLOY_DEST: config.dest,
 		DEPLOY_DEST_PROTOCOL: destMatches[1],
 		DEPLOY_DEST_USER: destMatches[2],
 		DEPLOY_DEST_HOST: destMatches[3],
