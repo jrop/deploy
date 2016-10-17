@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 'use strict'
 
+require('colors')
 const childProcess = require('child_process')
 const co = require('co')
 const deploy = require('./lib')
@@ -8,28 +9,32 @@ const fs = require('mz/fs')
 const inquirer = require('inquirer')
 const path = require('path')
 const rsync = require('rsyncwrapper')
+const shellQuote = require('shell-quote')
 const yargs = require('yargs')
 
-function exec(obj, verbose, runner) {
-	runner = runner || childProcess.exec
+function exec(command) {
 	return new Promise((yes, no) => {
-		runner(obj, (err, stdout, stderr, cmd) => {
-			if (verbose && stdout)
-				console.log(stdout)
-			const ret = { stdout, stderr, cmd }
-			return err ? no(Object.assign(err, ret)) : yes(ret)
+		const [ cmd, ...args ] = shellQuote.parse(command, process.env)
+		const proc = childProcess.spawn(cmd, args, {
+			env: process.env,
+			stdio: 'inherit',
 		})
+		proc.on('error', e => no(e))
+		proc.on('exit', (code, signal) =>
+			(typeof code == 'number' && code == 0 ?
+				yes() :
+				no(new Error(`"${command}" exited with code: ${code || signal}`))))
 	})
 }
 
-const getCommand = co.wrap(function* (conf) {
+const getRsyncCommand = co.wrap(function* (conf) {
 	conf.noExec = true
-	const cmd = (yield exec(conf, false, rsync)).cmd
+	const [ ,, cmd ] = (yield done => rsync(conf, done))
 	conf.noExec = false
 	return cmd
 })
 
-co(function* () {
+co(function * main() {
 	const args = yargs.usage('$0 [options]')
 		.options({
 			'alias': { alias: 'a', type: 'string', desc: 'Use an aliased destination' },
@@ -63,7 +68,8 @@ co(function* () {
 		process.env[envName] = parsed.env[envName]
 	}
 
-	console.log('Command:', yield getCommand(conf))
+	const rsyncCommand = yield getRsyncCommand(conf)
+	console.log('Command:', rsyncCommand)
 	let run = true
 	if (args.confirm) {
 		const answer = yield inquirer.prompt([ {
@@ -77,22 +83,30 @@ co(function* () {
 
 	if (run) {
 		for (const hook of parsed.preHooks) {
-			console.log('Executing pre-hook:', hook)
+			console.log()
+			console.log('> Executing pre-hook:'.yellow, hook)
+			console.log()
 			yield exec(hook, true)
 		}
 
-		console.log('Executing rsync')
-		yield exec(conf, true, rsync)
+		console.log()
+		console.log('> Executing rsync:'.yellow, rsyncCommand)
+		console.log()
+		yield exec(rsyncCommand)
 
 		for (const hook of parsed.postHooks) {
-			console.log('Executing post-hook:', hook)
+			console.log()
+			console.log('> Executing post-hook:'.yellow, hook)
+			console.log()
 			yield exec(hook, true)
 		}
 	} else {
+		process.exitCode = 1
 		console.log('Aborting')
 	}
 }).catch((e) => {
-	if (e.cmd) console.error('Error executing shell command', e.cmd)
-	if (e.stderr) console.error(e.stderr)
-	console.error(e.stack)
+	process.exitCode = 1
+	if (e.cmd) console.error('Error executing shell command'.red, e.cmd)
+	if (e.stderr) console.error(e.stderr.red)
+	console.error(e && typeof e.stack == 'string' ? e.stack.red : e)
 })

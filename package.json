@@ -1,6 +1,6 @@
 {
   "name": "deploy-rsync",
-  "version": "2.2.1",
+  "version": "2.3.0",
   "bin": {
     "deploy": "./deploy.js"
   },
@@ -12,10 +12,12 @@
   "dependencies": {
     "arrify": "^1.0.1",
     "co": "^4.6.0",
+    "colors": "^1.1.2",
     "inquirer": "^1.0.2",
     "mz": "^2.1.0",
     "object.omit": "^2.0.0",
     "rsyncwrapper": "^1.0.0",
+    "shell-quote": "^1.6.1",
     "yargs": "^4.6.0"
   },
   "devDependencies": {
