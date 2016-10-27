@@ -14,7 +14,8 @@ const yargs = require('yargs')
 
 function exec(command) {
 	return new Promise((yes, no) => {
-		const [ cmd, ...args ] = shellQuote.parse(command, process.env)
+		let [ cmd, ...args ] = shellQuote.parse(command, process.env) // eslint-disable-line prefer-const
+		args = args.map(arg => arg.op == 'glob' ? arg.pattern : arg)
 		const proc = childProcess.spawn(cmd, args, {
 			env: process.env,
 			stdio: 'inherit',
