@@ -13,19 +13,19 @@
     "arrify": "^1.0.1",
     "co": "^4.6.0",
     "colors": "^1.1.2",
-    "inquirer": "^1.0.2",
+    "inquirer": "^3.2.3",
     "mz": "^2.1.0",
     "object.omit": "^2.0.0",
-    "rsyncwrapper": "^1.0.0",
+    "rsyncwrapper": "^2.0.1",
     "shell-quote": "^1.6.1",
-    "yargs": "^4.6.0"
+    "yargs": "^8.0.2"
   },
   "devDependencies": {
     "bdd-stdin": "^0.2.0",
-    "chai": "^3.5.0",
-    "eslint": "^2.8.0",
+    "chai": "^4.1.2",
+    "eslint": "^4.5.0",
     "istanbul": "^0.4.3",
-    "mocha": "^2.4.5"
+    "mocha": "^3.5.0"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
