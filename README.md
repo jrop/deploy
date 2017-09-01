@@ -1,5 +1,7 @@
 # Deploy
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/jrop/deploy.svg)](https://greenkeeper.io/)
+
 > Control rsync with config in your package.json
 
 ## Installation
